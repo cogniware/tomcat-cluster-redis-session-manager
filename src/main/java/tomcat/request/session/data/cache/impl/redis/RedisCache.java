@@ -1,5 +1,7 @@
 package tomcat.request.session.data.cache.impl.redis;
 
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import redis.clients.jedis.Connection;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisPoolConfig;
 import tomcat.request.session.data.cache.DataCache;
@@ -60,12 +62,13 @@ public class RedisCache implements DataCache {
     private void initialize(Config config) {
         Collection<?> nodes = getJedisNodes(config.getRedisHosts(), config.getRedisConfigType());
         JedisPoolConfig poolConfig = getPoolConfig(config);
+        GenericObjectPoolConfig<Connection> genericObjectPoolConfig = getGenericObjectPoolConfig(config);
         switch (config.getRedisConfigType()) {
             case CLUSTER:
                 this.dataCache = new RedisClusterManager((Set<HostAndPort>) nodes,
                         config.getRedisPassword(),
                         config.getRedisTimeout(),
-                        poolConfig);
+                        genericObjectPoolConfig);
                 break;
             case SENTINEL:
                 this.dataCache = new RedisSentinelManager((Set<String>) nodes,
@@ -87,13 +90,12 @@ public class RedisCache implements DataCache {
     }
 
     /**
-     * To get redis pool config.
+     * Set common pool config properties.
      *
+     * @param poolConfig - The pool config object.
      * @param config - Application config.
-     * @return - Returns the redis pool config.
      */
-    private JedisPoolConfig getPoolConfig(Config config) {
-        JedisPoolConfig poolConfig = new JedisPoolConfig();
+    private void setCommonPoolConfigProperties(GenericObjectPoolConfig<?> poolConfig, Config config) {
         poolConfig.setMaxTotal(config.getRedisMaxActive());
         poolConfig.setTestOnBorrow(config.getRedisTestOnBorrow());
         poolConfig.setTestOnReturn(config.getRedisTestOnReturn());
@@ -102,6 +104,29 @@ public class RedisCache implements DataCache {
         poolConfig.setTestWhileIdle(config.getRedisTestWhileIdle());
         poolConfig.setNumTestsPerEvictionRun(config.getRedisTestNumPerEviction());
         poolConfig.setTimeBetweenEvictionRunsMillis(config.getRedisTimeBetweenEviction());
+    }
+
+    /**
+     * To get Jedis pool config.
+     *
+     * @param config - Application config.
+     * @return - Returns the Jedis pool config.
+     */
+    private JedisPoolConfig getPoolConfig(Config config) {
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        setCommonPoolConfigProperties(poolConfig, config);
+        return poolConfig;
+    }
+
+    /**
+     * To get generic object pool config.
+     *
+     * @param config - Application config.
+     * @return - Returns the generic object pool config.
+     */
+    private GenericObjectPoolConfig<Connection> getGenericObjectPoolConfig(Config config) {
+        GenericObjectPoolConfig<Connection> poolConfig = new GenericObjectPoolConfig<>();
+        setCommonPoolConfigProperties(poolConfig, config);
         return poolConfig;
     }
 

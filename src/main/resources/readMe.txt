@@ -5,9 +5,7 @@
  */
 
 Supports:
-   - Apache Tomcat 7
-   - Apache Tomcat 8
-   - Apache Tomcat 9
+   - Apache Tomcat 10
 
 Pre-requisite:
 	1. jedis.jar
@@ -36,5 +34,6 @@ Steps to be done,
 		<session-config>
 
 Note:
+  - Support for Java 17 with JakartaEE 9.1
   - All your session attribute values must implement java.io.Serializable.
   - Supports redis default, sentinel and cluster based on the redis-data-cache.properties configuration.
