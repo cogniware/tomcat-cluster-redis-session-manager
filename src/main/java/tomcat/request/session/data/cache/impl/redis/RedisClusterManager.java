@@ -1,8 +1,9 @@
 package tomcat.request.session.data.cache.impl.redis;
 
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import redis.clients.jedis.Connection;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.exceptions.JedisRedirectionException;
@@ -21,8 +22,9 @@ class RedisClusterManager extends RedisManager {
     RedisClusterManager(Set<HostAndPort> nodes,
                         String password,
                         int timeout,
-                        JedisPoolConfig poolConfig) {
+                        GenericObjectPoolConfig<Connection> poolConfig) {
         super(null, FAILURE_WAIT_TIME);
+
         this.cluster = new JedisCluster(nodes, timeout, Protocol.DEFAULT_TIMEOUT, DEFAULT_MAX_RE_DIRECTIONS, password, poolConfig);
     }
 
