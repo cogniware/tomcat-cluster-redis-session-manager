@@ -113,7 +113,7 @@ public class SingleSignOnValve extends SingleSignOn {
     public void sessionDestroyed(String ssoId, Session session) {
         if (this.getState().isAvailable()) {
             if ((session.getMaxInactiveInterval() <= 0 ||
-                    session.getIdleTimeInternal() < (long) (session.getMaxInactiveInterval() * 1000))
+                    session.getIdleTimeInternal() < (session.getMaxInactiveInterval() * 1000L))
                     && session.getManager().getContext().getState().isAvailable()) {
 
                 LOGGER.debug("singleSignOn.debug.sessionLogout, session: {}", session);
@@ -217,7 +217,7 @@ public class SingleSignOnValve extends SingleSignOn {
         SingleSignOnEntry entry = this.manager.getSingleSignOnEntry(ssoId);
         if (entry != null) {
             entry.removeSession(session);
-            if (entry.findSessions().size() == 0) {
+            if (entry.findSessions().isEmpty()) {
                 this.deregister(ssoId);
             }
         }

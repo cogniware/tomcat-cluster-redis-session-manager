@@ -25,21 +25,13 @@ public class SessionManagerTest extends HttpServlet {
 
 		String action = request.getParameter("action");
 		action = (action == null) ? "" : action;
-		String responseData = null;
+		String responseData = switch (action.toUpperCase()) {
+      case "SET" -> setSessionValues(request.getSession());
+      case "GET" -> getSessionValues(request.getSession(), action);
+      default -> getActions(request);
+    };
 
-		switch (action.toUpperCase()) {
-		case "SET":
-			responseData = setSessionValues(request.getSession());
-			break;
-		case "GET":
-			responseData = getSessionValues(request.getSession(), action);
-			break;
-		default:
-			responseData = getActions(request);
-			break;
-		}
-
-		sendResponse(response, responseData);
+    sendResponse(response, responseData);
 	}
 
 	/**
@@ -62,7 +54,7 @@ public class SessionManagerTest extends HttpServlet {
 	 * @return
 	 */
 	private String getActions(HttpServletRequest request) {
-		StringBuffer xml = new StringBuffer();
+		StringBuilder xml = new StringBuilder();
 
 		xml.append("<!DOCTYPE html>");
 		xml.append("<html>");
@@ -114,7 +106,7 @@ public class SessionManagerTest extends HttpServlet {
 	 * @return
 	 */
 	private String getSessionValues(HttpSession session, String action) {
-		StringBuffer xml = new StringBuffer();
+		StringBuilder xml = new StringBuilder();
 		xml.append("<!DOCTYPE html>");
 		xml.append("<html>");
 		xml.append("<head>");
