@@ -60,7 +60,7 @@ public class SingleSignOnValve extends SingleSignOn {
                 Cookie[] cookies = request.getCookies();
                 if (cookies != null) {
                     for (Cookie value : cookies) {
-                        if (Constants.SINGLE_SIGN_ON_COOKIE.equals(value.getName())) {
+                        if (getCookieName().equals(value.getName())) {
                             cookie = value;
                             break;
                         }
